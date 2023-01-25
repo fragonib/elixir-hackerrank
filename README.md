@@ -1,3 +1,3 @@
 # elixir-hackerrank
 
-Practice exercises from HackerRank in elixir language
+Exercises from HackerRank in elixir language
