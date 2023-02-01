@@ -15,11 +15,15 @@ end
 
 defmodule Convexhull do
 
-  import ElixirMath
   import Stack
 
-  def find_lowestleftmost_point(points) do
-    Enum.min(points, &is_first_one_lowest/2)
+  def find_lowestleftmost_point([p|points]), do: find_lowestleftmost_point(p, points)
+
+  def find_lowestleftmost_point(c, []), do: c
+  def find_lowestleftmost_point(c, [p|points]) do
+    find_lowestleftmost_point(
+      if is_first_one_lowest(c, p) do c else p end,
+      points)
   end
 
   def is_first_one_lowest({x1, y1}, {x2, y2}) do
@@ -75,14 +79,16 @@ defmodule Convexhull do
     (x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1)
   end
 
-  def perimeter([p0|points] = all) do
-    # Enum.reduce(points, {p0, distance(p0, List.last(points))},
-    #   fn p, {pant, d} -> {p, d + distance(pant, p)} end)
-    #   |> elem(1)
-
-    (Enum.zip_with(all, points, &distance/2)
-    |> Enum.sum) + distance(p0, List.last(points))
+  def perimeter([p0|points]) do
+    Enum.reduce(points, {p0, distance(p0, List.last(points))},
+      fn p, {pant, d} -> {p, d + distance(pant, p)} end)
+      |> elem(1)
   end
+
+  #def perimeter([p0|points] = all) do
+    # (Enum.zip_with(all, points, &distance/2)
+    # |> Enum.sum) + distance(p0, List.last(points))
+  #end
 
   def distance({x1, y1}, {x2, y2}) do
     :math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2))
