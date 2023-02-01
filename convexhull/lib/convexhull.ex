@@ -76,5 +76,30 @@ defmodule Convexhull do
   def distance({x1, y1}, {x2, y2}) do
     sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2))
   end
-      
+  
+  def read_problem do
+    IO.read(:stdio, :line)
+    |> Integer.parse()
+    |> elem(0)
+    |> read_points()
+  end
+
+  def read_points(0), do: []
+  def read_points(n) do
+    {x, r} = IO.read(:stdio, :line)
+             |> Integer.parse()
+    y = String.trim(r)
+        |> Integer.parse()
+        |> elem(0)
+    [{x, y} | read_points(n-1)]
+  end
+
+  def solve_problem do
+    read_problem()
+    |> convexhull()
+    |> perimeter()
+    |> IO.puts
+  end
+
 end
+
