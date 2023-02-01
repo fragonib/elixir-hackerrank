@@ -1,3 +1,18 @@
+defmodule Stack do
+  def empty, do: []
+
+  def push(st, elem), do: [elem|st]
+
+  def top([t|_]), do: t
+
+  def next_to_top([_, nt|_]), do: nt
+
+  def pop([_|st]), do: st
+
+  def larger_than_1([_,_|_]), do: true
+  def larger_than_1(_), do: false
+end
+
 defmodule Convexhull do
 
   import ElixirMath
@@ -15,12 +30,8 @@ defmodule Convexhull do
     end
   end
 
-  def angle({x1, y1}, {x2, y2}) do
-    ElixirMath.atan2((y2 - y1), (x2 - x1))
-  end
-
   def compare_angles(ref, p1, p2) do
-    angle(ref, p1) <= angle(ref, p2)
+    ccw(ref, p1, p2) >= 0
   end
 
   def sort_points(points) do
@@ -74,7 +85,7 @@ defmodule Convexhull do
   end
 
   def distance({x1, y1}, {x2, y2}) do
-    sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2))
+    :math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2))
   end
   
   def read_problem do
@@ -103,3 +114,4 @@ defmodule Convexhull do
 
 end
 
+Convexhull.solve_problem()
