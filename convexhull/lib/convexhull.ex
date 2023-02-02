@@ -1,10 +1,29 @@
+defmodule Stack do
+  def empty, do: []
+
+  def push(st, elem), do: [elem|st]
+
+  def top([t|_]), do: t
+
+  def next_to_top([_, nt|_]), do: nt
+
+  def pop([_|st]), do: st
+
+  def larger_than_1([_,_|_]), do: true
+  def larger_than_1(_), do: false
+end
+
 defmodule Convexhull do
 
-  import ElixirMath
   import Stack
 
-  def find_lowestleftmost_point(points) do
-    Enum.min(points, &is_first_one_lowest/2)
+  def find_lowestleftmost_point([p|points]), do: find_lowestleftmost_point(p, points)
+
+  def find_lowestleftmost_point(c, []), do: c
+  def find_lowestleftmost_point(c, [p|points]) do
+    find_lowestleftmost_point(
+      if is_first_one_lowest(c, p) do c else p end,
+      points)
   end
 
   def is_first_one_lowest({x1, y1}, {x2, y2}) do
@@ -15,12 +34,8 @@ defmodule Convexhull do
     end
   end
 
-  def angle({x1, y1}, {x2, y2}) do
-    ElixirMath.atan2((y2 - y1), (x2 - x1))
-  end
-
   def compare_angles(ref, p1, p2) do
-    angle(ref, p1) <= angle(ref, p2)
+    ccw(ref, p1, p2) >= 0
   end
 
   def sort_points(points) do
@@ -64,17 +79,45 @@ defmodule Convexhull do
     (x2 - x1) * (y3 - y1) - (y2 - y1) * (x3 - x1)
   end
 
-  def perimeter([p0|points] = all) do
-    # Enum.reduce(points, {p0, distance(p0, List.last(points))},
-    #   fn p, {pant, d} -> {p, d + distance(pant, p)} end)
-    #   |> elem(1)
-
-    (Enum.zip_with(all, points, &distance/2)
-    |> Enum.sum) + distance(p0, List.last(points))
+  def perimeter([p0|points]) do
+    Enum.reduce(points, {p0, distance(p0, List.last(points))},
+      fn p, {pant, d} -> {p, d + distance(pant, p)} end)
+      |> elem(1)
   end
+
+  #def perimeter([p0|points] = all) do
+    # (Enum.zip_with(all, points, &distance/2)
+    # |> Enum.sum) + distance(p0, List.last(points))
+  #end
 
   def distance({x1, y1}, {x2, y2}) do
-    sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2))
+    :math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2))
   end
-      
+  
+  def read_problem do
+    IO.read(:stdio, :line)
+    |> Integer.parse()
+    |> elem(0)
+    |> read_points()
+  end
+
+  def read_points(0), do: []
+  def read_points(n) do
+    {x, r} = IO.read(:stdio, :line)
+             |> Integer.parse()
+    y = String.trim(r)
+        |> Integer.parse()
+        |> elem(0)
+    [{x, y} | read_points(n-1)]
+  end
+
+  def solve_problem do
+    read_problem()
+    |> convexhull()
+    |> perimeter()
+    |> IO.puts
+  end
+
 end
+
+Convexhull.solve_problem()
